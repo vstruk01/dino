@@ -1,20 +1,11 @@
 package world.ucode;
 
-import javafx.animation.AnimationTimer;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.scene.image.*;
-import javafx.stage.Stage;
-import java.util.Random;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+
 
 public class Dino implements Object {
     public long speed = 100;
@@ -24,10 +15,11 @@ public class Dino implements Object {
     final private int countSprites = 6;
     private double width = 80;
     private double height = 86;
-    final private double x = 100;
-    private double y = 644;
-    final private double maxHeight = 644;
-    final private double minHeight = 200;
+    private double x;
+    private double y;
+    private double maxHeight;
+    private double minHeight;
+
 
     public enum Direction {
         DEFAULT,
@@ -59,7 +51,11 @@ public class Dino implements Object {
     public Canvas dinoCanvas = new Canvas(2000, 1000);
     final private GraphicsContext currSpriteImage = dinoCanvas.getGraphicsContext2D();
 
-    Dino() {
+    Dino(double x, double y) {
+        this.x = x;
+        this.y = y;
+        this.maxHeight = y;
+        this.minHeight = y - 250;
         Sprites[0] = new Image("main-character3.png");
         Sprites[1] = new Image("main-character1.png");
         Sprites[2] = new Image("main-character2.png");
@@ -68,62 +64,74 @@ public class Dino implements Object {
         Sprites[5] = new Image("main-character4.png");
     }
 
+    public void setDirectionPressed(KeyEvent event) {
+        if (event == null) { return; }
+        if ((event.getCode() == KeyCode.SPACE || event.getCode() == KeyCode.UP ) && this.direction == Direction.DEFAULT) {
+            this.direction = Direction.FLY_UP;
+        } else if (event.getCode() == KeyCode.DOWN && this.direction == Direction.FLY_DOWN) {
+            this.speedFlyDown *= 2;
+        } else if (event.getCode() == KeyCode.DOWN && this.direction == Direction.DEFAULT) {
+            currSpriteImage.clearRect(this.x, this.y, width, height);
+            this.y += 30;
+            this.maxHeight = this.y;
+            this.width = 110;
+            this.height = 56;
+            this.currSpriteIdx = posSprite.DOWN_RIGHT;
+            this.direction = Direction.DOWN;
+        }
+    }
+    public void setDirectionReleased(KeyEvent event) {
+        if (event == null) { return; }
+        if (event.getCode() == KeyCode.DOWN && this.direction == Dino.Direction.DOWN) {
+            currSpriteImage.clearRect(this.x, this.y, width, height);
+            this.y -= 30;
+            this.maxHeight = this.y;
+            this.width = 80;
+            this.height = 86;
+            this.currSpriteIdx = posSprite.UP_RIGHT;
+            this.direction = Dino.Direction.DEFAULT;
+        }
+    }
 
     @Override
     public void MoveObject() {
-//        dinoCanvas.setFocusTraversable(true);
-//        dinoCanvas.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-//            if (event.getCode() == KeyCode.SPACE) {
-//                System.out.println("Space");
-//            }
-//        });
+        this.currSpriteImage.clearRect(this.x, this.y, width, height);
         if (direction == Direction.FLY_UP) {
-            currSpriteImage.clearRect(this.x, this.y, 110, 86);
-            y -= (y - 100) / maxHeight * speedFlyDown;
-            currSpriteImage.drawImage(Sprites[posSprite.DEFAULT.getValue()], this.x, this.y, this.width, this.height);
+            this.y -= (y - 200) / maxHeight * speedFlyDown;
+            currSpriteIdx = posSprite.DEFAULT;
         } else if (direction == Direction.FLY_DOWN) {
-            currSpriteImage.clearRect(this.x, this.y, 110, 86);
-            y += (y - 100) / maxHeight * speedFlyDown;
-            currSpriteImage.drawImage(Sprites[posSprite.DEFAULT.getValue()], this.x, this.y, this.width, this.height);
+            this.y += (y - 200) / maxHeight * speedFlyDown;
+            currSpriteIdx = posSprite.DEFAULT;
         }
 
         if (y <= minHeight) {
-            currSpriteImage.clearRect(this.x, this.y, 110, 86);
-            y = minHeight;
-            currSpriteImage.drawImage(Sprites[posSprite.DEFAULT.getValue()], this.x, this.y, this.width, this.height);
-            direction = Direction.FLY_DOWN;
+            this.y = minHeight;
+            this.direction = Direction.FLY_DOWN;
         } else if (y > maxHeight) {
-            currSpriteImage.clearRect(this.x, this.y, 110, 86);
-            y = maxHeight;
-            currSpriteImage.drawImage(Sprites[posSprite.DEFAULT.getValue()], this.x, this.y, this.width, this.height);
+            this.currSpriteIdx = posSprite.UP_LEFT;
+            this.y = maxHeight;
         }
-        if (y == maxHeight) {
+        if (this.y == maxHeight) {
             speedFlyDown = 30;
             if (direction == Direction.FLY_DOWN) {
-                direction = Direction.DEFAULT;
+                this.direction = Direction.DEFAULT;
             }
             if (speedDino.getSpeed(speed)) {
-                currSpriteImage.clearRect(this.x, this.y, 110, 86);
                 if (direction == Direction.DEFAULT) {
                     if (currSpriteIdx == posSprite.UP_RIGHT) {
-                        currSpriteIdx = posSprite.UP_LEFT;
+                        this.currSpriteIdx = posSprite.UP_LEFT;
                     } else {
-                        currSpriteIdx = posSprite.UP_RIGHT;
+                        this.currSpriteIdx = posSprite.UP_RIGHT;
                     }
-                    currSpriteImage.drawImage(Sprites[currSpriteIdx.getValue()], this.x, this.y, this.width, this.height);
-                } else if (direction == Direction.DOWN) {
-                    this.width = 110;
-                    this.height = 56;
+                } else if (this.direction == Direction.DOWN) {
                     if (currSpriteIdx == posSprite.DOWN_LEFT) {
-                        currSpriteIdx = posSprite.DOWN_RIGHT;
+                        this.currSpriteIdx = posSprite.DOWN_RIGHT;
                     } else {
-                        currSpriteIdx = posSprite.DOWN_LEFT;
+                        this.currSpriteIdx = posSprite.DOWN_LEFT;
                     }
-                    currSpriteImage.drawImage(Sprites[currSpriteIdx.getValue()], this.x, this.y + 30, this.width, this.height);
                 }
-                this.width = 80;
-                this.height = 86;
             }
         }
+        this.currSpriteImage.drawImage(this.Sprites[this.currSpriteIdx.getValue()], this.x, this.y, this.width, this.height);
     }
 }

@@ -3,10 +3,9 @@ package world.ucode;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.effect.Effect;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.image.*;
 import javafx.stage.Stage;
@@ -14,112 +13,97 @@ import java.util.Random;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 
-import javafx.scene.transform.Rotate;
-import javafx.animation.*;
-import javafx.util.Duration;
-import javafx.scene.*;
 
 public class GamePlay {
+    final private double heightMainWindow = 500;
+    final private double widthMainWindow = 1000;
 
-    // Sprite
-    Image[] imageGround = new Image[3];
-    ImageView[] ground = new ImageView[20];
+//    Image[] imageGround = new Image[3];
+    Group g1 = new Group();
 
-    // window and size
-    private int countDino = 1;
-    private int countShuriken = 20;
+    final private int countDino = 1;
+    final private int countObstacle = 15;
+    final private int countGround = 15;
 
-    private double posYLastShuriken = 1800;
-    private int lastIdx = countShuriken - 1;
+    Ground ground = new Ground(0, 400, countGround);
+    Obstacle[] obstacles = new Obstacle[countObstacle];
+    Dino[] dins = new Dino[countDino];
 
-    Shuriken[] shurikens = new Shuriken[countShuriken];
-    Group g1;
-    Dino[] dinos = new Dino[countDino];
-//    Group ground;
 
-    public Text ts;
-    public int score = 0;
+    private Text scoreText = new Text();
+    private Text fpsText = new Text();
+    private Text recordText = new Text();
+    private int score = 0;
+    private int record = score;
 
     // load image
 
     public void Init() {
-        Random rand = new Random(System.currentTimeMillis() / (long)posYLastShuriken);
+        Random rand = new Random(System.currentTimeMillis());
+
         for (int i = 0; i < countDino; i++) {
-            dinos[i] = new Dino(100 + (i * 200), 644);
+            dins[i] = new Dino(100 + (i * 200), 350);
         }
-        for (int i = 0; i < countShuriken; i++) {
-            shurikens[i] = new Shuriken(rand.nextInt(200) + posYLastShuriken + 400);
-            posYLastShuriken = shurikens[i].getX();
+        for (int i = 0; i < countObstacle; i++) {
+            obstacles[i] = new Obstacle(widthMainWindow, 400, 200);
         }
 
         imageGround[0] = new Image("land1.png");
         imageGround[1] = new Image("land2.png");
         imageGround[2] = new Image("land3.png");
-        for (int i = 0; i < ground.length; i++) {
-            ground[i] = new ImageView(imageGround[rand.nextInt(3)]);
-            ground[i].setFitWidth(100);
-            ground[i].setFitHeight(50);
-            ground[i].setTranslateX(i * 100);
-            ground[i].setTranslateY(700);
-        }
 
-        ts.setText("Score: " + Integer.toString(score));
-        ts.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 50));
-        ts.setY(100);
-        ts.setX(100);
-    }
+        scoreText.setText("Score: " + score);
+        recordText.setText("Record: " + record);
+        fpsText.setText("fps: 0");
 
-    // start play
+        scoreText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+        recordText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+        fpsText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 
-    public void Play(Stage primaryStage) {
-        g1 = new Group();
-        ts = new Text();
-        Init();
+        scoreText.setY(20);
+        scoreText.setX(20);
+        recordText.setY(20);
+        recordText.setX(widthMainWindow / 2);
+        fpsText.setY(20);
+        fpsText.setX(widthMainWindow - 80);
 
         for (ImageView imageView : ground) {
             g1.getChildren().add(imageView);
         }
-        for (Dino dino : dinos) {
-            g1.getChildren().add(dino.dinoCanvas);
+        for (Dino dino : dins) {
+            g1.getChildren().add(dino.canvas);
         }
-        for (Shuriken shuriken : shurikens) {
-            g1.getChildren().add(shuriken.shurikenCanvas);
-
+        for (Obstacle obstacle : obstacles) {
+            g1.getChildren().add(obstacle.canvas);
         }
 
-        g1.getChildren().add(ts);
-
-        // Canvas new
-
-//        Canvas cn = new Canvas(100, 100);
-//        cn.setTranslateY(500);
-//        cn.setTranslateX(1000);
-//        var gc = cn.getGraphicsContext2D();
-//        gc.setFill(Color.RED);
-//        gc.fillRect(0, 0, 50, 50);
-//        g1.getChildren().add(cn);
+        g1.getChildren().addAll(scoreText, recordText, fpsText);
+    }
 
 
-        // end
+    // start play
+
+    public void Play(Stage primaryStage) {
+        if (primaryStage == null) {return;}
+        Init();
 
         AnimationTimer timer = new Update();
         timer.start();
-        Scene scene = new Scene(g1, 2000, 1000, Color.web("F7F7F7"));
 
-        scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            for (Dino dino : dinos) {
-                dino.setDirectionPressed(event);
-            }
-        });
+        Scene scene = new Scene(g1, widthMainWindow, heightMainWindow, Color.web("F7F7F7"));
+        setHandle(scene);
 
-        scene.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            for (Dino dino : dinos) {
-                dino.setDirectionReleased(event);
-            }
-        });
+        Rectangle r1 = new Rectangle(100, 100);
+        Rectangle r2 = new Rectangle(100, 100);
+        r1.setX(100);
+        r1.setY(100);
+        r2.setX(201);
+        r2.setY(201);
+//        g1.getChildren().addAll(r1, r2);
+        if (r1.intersects(r2.getBoundsInLocal())) {
+            System.out.println("hello and stop");
+        }
 
         primaryStage.setTitle("T-Rex Runner");
         primaryStage.setScene(scene);
@@ -129,34 +113,65 @@ public class GamePlay {
 
     public class Update extends AnimationTimer {
         public void handle(long now) {
-            updateDino();
-            updateGround();
-            updateShuriken();
-//            updateCloud();
-        }
-        private void updateDino() {
-            for (Dino dino : dinos) {
-                dino.MoveObject();
-            }
-        }
-        private void updateGround() {
+//            long start = System.currentTimeMillis();
 
+            update();
+
+//            long end = System.currentTimeMillis();
+//            if (end - start < 16) {
+//                try {
+//                    Thread.sleep(16 - (end - start));
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            end = System.currentTimeMillis();
+//            fpsText.setText("fps: " +  (1000 / (end - start)));
+            score++;
+            scoreText.setText("Score: " + score);
         }
-        private void updateShuriken() {
-            for (int i = 0; i < countShuriken; i++) {
-                double x = shurikens[i].getX();
-                if (x < -40) {
-                    Random rand = new Random(System.currentTimeMillis() / (long)posYLastShuriken);
-                    x = rand.nextInt(200) + posYLastShuriken + 400;
-                    double y = rand.nextInt(170) + 500; // 500 - 670
-                    shurikens[i].setX(x);
-                    shurikens[i].setY(y);
-                    posYLastShuriken = x;
-                    lastIdx = i;
-                }
-                shurikens[i].MoveObject();
+
+        private void update() {
+            for (Dino dino : dins) {
+                dino.clear();
+                dino.updateObject();
+                dino.draw();
             }
-            posYLastShuriken = shurikens[lastIdx].getX();
+            for (Obstacle obstacle : obstacles) {
+                obstacle.clear();
+                obstacle.updateObject();
+                obstacle.draw();
+            }
+            for () {
+                ground.update();
+            }
+            for (Obstacle obstacle : obstacles) {
+                Rectangle r1 = new Rectangle(obstacle.width - 10, obstacle.height - 10);
+                r1.setY(obstacle.y - 5);
+                r1.setX(obstacle.x - 5);
+                for (Dino dino : dins) {
+                    Rectangle r2 = new Rectangle(dino.width - 10, dino.height - 10);
+                    r2.setY(dino.y - 5);
+                    r2.setX(dino.x - 5);
+                    if (r1.intersects(r2.getBoundsInLocal())) {
+                        System.out.println("stop here crap !");
+                    }
+                }
+            }
         }
+    }
+
+    // set handle
+    public  void setHandle(Scene scene) {
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            for (Dino dino : dins) {
+                dino.setDirectionPressed(event);
+            }
+        });
+        scene.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+            for (Dino dino : dins) {
+                dino.setDirectionReleased(event);
+            }
+        });
     }
 }

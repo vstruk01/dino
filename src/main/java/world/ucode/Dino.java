@@ -7,18 +7,19 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 
 
-public class Dino implements Object {
+public class Dino extends ObjectGame {
     public long speed = 100;
     final private Speed speedDino = new Speed();
 
-    public double speedFlyDown = 30;
+    public double speedFly = 30;
     final private int countSprites = 6;
-    private double width = 80;
-    private double height = 86;
-    private double x;
-    private double y;
+//    private double width = 80;
+//    private double height = 86;
+//    private double x;
+//    private double y;
     private double maxHeight;
     private double minHeight;
+    private double sizeJump = 256;
 
 
     public enum Direction {
@@ -48,14 +49,17 @@ public class Dino implements Object {
     }
     public posSprite currSpriteIdx = posSprite.DEFAULT;
     final private Image[] Sprites = new Image[countSprites];
-    public Canvas dinoCanvas = new Canvas(2000, 1000);
-    final private GraphicsContext currSpriteImage = dinoCanvas.getGraphicsContext2D();
+//    public Canvas dinoCanvas = new Canvas(1000, 500);
+//    final private GraphicsContext currSpriteImage = dinoCanvas.getGraphicsContext2D();
 
     Dino(double x, double y) {
+        width = 80;
+        height = 86;
         this.x = x;
         this.y = y;
         this.maxHeight = y;
-        this.minHeight = y - 250;
+        this.minHeight = y - sizeJump;
+        canvas = new Canvas(width, height);
         Sprites[0] = new Image("main-character3.png");
         Sprites[1] = new Image("main-character1.png");
         Sprites[2] = new Image("main-character2.png");
@@ -64,43 +68,29 @@ public class Dino implements Object {
         Sprites[5] = new Image("main-character4.png");
     }
 
-    public void setDirectionPressed(KeyEvent event) {
-        if (event == null) { return; }
-        if ((event.getCode() == KeyCode.SPACE || event.getCode() == KeyCode.UP ) && this.direction == Direction.DEFAULT) {
-            this.direction = Direction.FLY_UP;
-        } else if (event.getCode() == KeyCode.DOWN && this.direction == Direction.FLY_DOWN) {
-            this.speedFlyDown *= 2;
-        } else if (event.getCode() == KeyCode.DOWN && this.direction == Direction.DEFAULT) {
-            currSpriteImage.clearRect(this.x, this.y, width, height);
-            this.y += 30;
-            this.maxHeight = this.y;
-            this.width = 110;
-            this.height = 56;
-            this.currSpriteIdx = posSprite.DOWN_RIGHT;
-            this.direction = Direction.DOWN;
-        }
-    }
-    public void setDirectionReleased(KeyEvent event) {
-        if (event == null) { return; }
-        if (event.getCode() == KeyCode.DOWN && this.direction == Dino.Direction.DOWN) {
-            currSpriteImage.clearRect(this.x, this.y, width, height);
-            this.y -= 30;
-            this.maxHeight = this.y;
-            this.width = 80;
-            this.height = 86;
-            this.currSpriteIdx = posSprite.UP_RIGHT;
-            this.direction = Dino.Direction.DEFAULT;
-        }
+
+    @Override
+    public void clear() {
+        this.canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
     }
 
     @Override
-    public void MoveObject() {
-        this.currSpriteImage.clearRect(this.x, this.y, width, height);
+    public void draw() {
+        canvas.setTranslateX(x);
+        canvas.setTranslateY(y);
+        canvas.setWidth(width);
+        canvas.setHeight(height);
+        this.canvas.getGraphicsContext2D().drawImage(this.Sprites[this.currSpriteIdx.getValue()], 0, 0, this.width, this.height);
+    }
+
+    @Override
+    public void updateObject() {
+        clear();
         if (direction == Direction.FLY_UP) {
-            this.y -= (y - 200) / maxHeight * speedFlyDown;
+            this.y -= (y - 40) / maxHeight * speedFly;
             currSpriteIdx = posSprite.DEFAULT;
         } else if (direction == Direction.FLY_DOWN) {
-            this.y += (y - 200) / maxHeight * speedFlyDown;
+            this.y += (y - 40) / maxHeight * speedFly;
             currSpriteIdx = posSprite.DEFAULT;
         }
 
@@ -112,7 +102,7 @@ public class Dino implements Object {
             this.y = maxHeight;
         }
         if (this.y == maxHeight) {
-            speedFlyDown = 30;
+            speedFly = 30;
             if (direction == Direction.FLY_DOWN) {
                 this.direction = Direction.DEFAULT;
             }
@@ -132,6 +122,62 @@ public class Dino implements Object {
                 }
             }
         }
-        this.currSpriteImage.drawImage(this.Sprites[this.currSpriteIdx.getValue()], this.x, this.y, this.width, this.height);
+        draw();
     }
+
+    public void setDirectionPressed(KeyEvent event) {
+        if (event == null) { return; }
+        if ((event.getCode() == KeyCode.SPACE || event.getCode() == KeyCode.UP ) && this.direction == Direction.DEFAULT) {
+            this.direction = Direction.FLY_UP;
+        } else if (event.getCode() == KeyCode.DOWN &&  (this.direction == Direction.FLY_UP || this.direction == Direction.FLY_DOWN)) {
+            this.speedFly *= 1.5;
+            this.direction = Direction.FLY_DOWN;
+        } else if (event.getCode() == KeyCode.DOWN && this.direction == Direction.DEFAULT) {
+            clear();
+            this.y += 30;
+            this.maxHeight = this.y;
+            this.width = 110;
+            this.height = 56;
+            this.currSpriteIdx = posSprite.DOWN_RIGHT;
+            this.direction = Direction.DOWN;
+        }
+    }
+    public void setDirectionReleased(KeyEvent event) {
+        if (event == null) { return; }
+        if (event.getCode() == KeyCode.DOWN && this.direction == Dino.Direction.DOWN) {
+            clear();
+            this.y -= 30;
+            this.maxHeight = this.y;
+            this.width = 80;
+            this.height = 86;
+            this.currSpriteIdx = posSprite.UP_RIGHT;
+            this.direction = Dino.Direction.DEFAULT;
+        }
+    }
+
+//    @Override
+//    public double getY() {
+//        return this.y;
+//    };
+//    @Override
+//    public  double getX() {
+//        return this.x;
+//    };
+//    public GraphicsContext getGraphicsContext() {
+//        return this.currSpriteGc;
+//    };
+//    @Override
+//    public Image getImage() {
+//        return this.Sprites[this.currSpriteIdx.getValue()];
+//    };
+
+//    @Override
+//    public double getHeight() {
+//        return height;
+//    };
+//
+//    @Override
+//    public double getWith() {
+//        return width;
+//    };
 }

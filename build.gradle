@@ -38,8 +38,8 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.base', 'javafx.graphics' ]
 }
 
-plugins.withType(JavaPlugin).configureEach {
-    java {
-        modularity.inferModulePath = true
-    }
-}
+//plugins.withType(JavaPlugin).configureEach {
+//    java {
+//        modularity.inferModulePath = true
+//    }
+//}

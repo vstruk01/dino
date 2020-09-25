@@ -1,21 +1,58 @@
 package world.ucode;
 
-import javafx.animation.AnimationTimer;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.scene.image.*;
-import javafx.stage.Stage;
-import java.util.Random;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 
-public class Cloud {
+import java.util.Random;
 
+public class Cloud extends ObjectGame {
+    static double YOfLastGround;
+    public double speed = 1;
+
+    Cloud(double x, double y, double width, double height, Image image) {
+        this.height = height;   // 50
+        this.width = width;     // 130
+        this.image = image;
+
+        if (this.YOfLastGround <= x) {
+            this.YOfLastGround = x;
+        }
+
+        canvas = new Canvas(this.width, this.height);
+        canvas.setTranslateX(this.YOfLastGround);
+        canvas.setTranslateY(400);
+        draw();
+
+        this.x = this.YOfLastGround;
+        this.YOfLastGround += width;
+        System.out.println(this.x);
+        System.out.println(this.YOfLastGround);
+
+    }
+
+    @Override
+    public void updateObject() {
+        if (this.x < -(this.width)) {
+            Random rand = new Random(System.currentTimeMillis());
+
+            this.x = rand.nextInt(100) + YOfLastGround + 100;
+            this.x = YOfLastGround;
+            YOfLastGround += this.x + this.width;
+        }
+        if (YOfLastGround == this.x + this.width) {
+            YOfLastGround -= speed;
+        }
+        this.x -= speed;
+        canvas.setTranslateX(this.x);
+    }
+
+    @Override
+    public void clear() {
+        canvas.getGraphicsContext2D().clearRect(0, 0, this.width, this.height);
+    }
+
+    @Override
+    public void draw() {
+        canvas.getGraphicsContext2D().drawImage(this.image, 0, 0, this.width, this.height);
+    }
 }

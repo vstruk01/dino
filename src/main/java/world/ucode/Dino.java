@@ -4,7 +4,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.image.*;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 
 
 public class Dino extends ObjectGame {
@@ -13,13 +12,8 @@ public class Dino extends ObjectGame {
 
     public double speedFly = 30;
     final private int countSprites = 6;
-//    private double width = 80;
-//    private double height = 86;
-//    private double x;
-//    private double y;
     private double maxHeight;
-    private double minHeight;
-    private double sizeJump = 256;
+    final private double sizeJump = 256;
 
 
     public enum Direction {
@@ -49,8 +43,6 @@ public class Dino extends ObjectGame {
     }
     public posSprite currSpriteIdx = posSprite.DEFAULT;
     final private Image[] Sprites = new Image[countSprites];
-//    public Canvas dinoCanvas = new Canvas(1000, 500);
-//    final private GraphicsContext currSpriteImage = dinoCanvas.getGraphicsContext2D();
 
     Dino(double x, double y) {
         width = 80;
@@ -58,29 +50,14 @@ public class Dino extends ObjectGame {
         this.x = x;
         this.y = y;
         this.maxHeight = y;
-        this.minHeight = y - sizeJump;
         canvas = new Canvas(width, height);
+
         Sprites[0] = new Image("main-character3.png");
         Sprites[1] = new Image("main-character1.png");
         Sprites[2] = new Image("main-character2.png");
         Sprites[3] = new Image("main-character6.png");
         Sprites[4] = new Image("main-character5.png");
         Sprites[5] = new Image("main-character4.png");
-    }
-
-
-    @Override
-    public void clear() {
-        this.canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
-    }
-
-    @Override
-    public void draw() {
-        canvas.setTranslateX(x);
-        canvas.setTranslateY(y);
-        canvas.setWidth(width);
-        canvas.setHeight(height);
-        this.canvas.getGraphicsContext2D().drawImage(this.Sprites[this.currSpriteIdx.getValue()], 0, 0, this.width, this.height);
     }
 
     @Override
@@ -94,8 +71,8 @@ public class Dino extends ObjectGame {
             currSpriteIdx = posSprite.DEFAULT;
         }
 
-        if (y <= minHeight) {
-            this.y = minHeight;
+        if (y <= maxHeight - sizeJump) {
+            this.y = maxHeight - sizeJump;
             this.direction = Direction.FLY_DOWN;
         } else if (y > maxHeight) {
             this.currSpriteIdx = posSprite.UP_LEFT;
@@ -122,6 +99,7 @@ public class Dino extends ObjectGame {
                 }
             }
         }
+        image = this.Sprites[this.currSpriteIdx.getValue()];
         draw();
     }
 
@@ -130,7 +108,7 @@ public class Dino extends ObjectGame {
         if ((event.getCode() == KeyCode.SPACE || event.getCode() == KeyCode.UP ) && this.direction == Direction.DEFAULT) {
             this.direction = Direction.FLY_UP;
         } else if (event.getCode() == KeyCode.DOWN &&  (this.direction == Direction.FLY_UP || this.direction == Direction.FLY_DOWN)) {
-            this.speedFly *= 1.5;
+            this.speedFly *= 2;
             this.direction = Direction.FLY_DOWN;
         } else if (event.getCode() == KeyCode.DOWN && this.direction == Direction.DEFAULT) {
             clear();
@@ -154,30 +132,4 @@ public class Dino extends ObjectGame {
             this.direction = Dino.Direction.DEFAULT;
         }
     }
-
-//    @Override
-//    public double getY() {
-//        return this.y;
-//    };
-//    @Override
-//    public  double getX() {
-//        return this.x;
-//    };
-//    public GraphicsContext getGraphicsContext() {
-//        return this.currSpriteGc;
-//    };
-//    @Override
-//    public Image getImage() {
-//        return this.Sprites[this.currSpriteIdx.getValue()];
-//    };
-
-//    @Override
-//    public double getHeight() {
-//        return height;
-//    };
-//
-//    @Override
-//    public double getWith() {
-//        return width;
-//    };
 }

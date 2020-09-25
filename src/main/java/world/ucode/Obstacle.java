@@ -9,24 +9,18 @@ import javafx.scene.*;
 
 public class Obstacle extends ObjectGame {
     static double YOfLastObstacle;
-    public double speed = 8;
-
-//    final private double size = 50;
-//    public double x;
-//    public double y;
+    private double speed = 12;
+    final private double maxSpeed = 20;
 
     final private double interval;
     final private int areaSpawn;
-    public Image obstacleImg = new Image("obstacle1.png");
 
-//    public Canvas obstacleCanvas = new Canvas(this.size, this.size);
+    Obstacle(double x, double interval, int areaSpawn, double width, double height) {
+        image = new Image("obstacle1.png");
 
-    Obstacle(double x, double interval, int areaSpawn) {
-        height = 50;
-        width = 50;
-
+        this.height = height;
+        this.width = width;
         canvas = new Canvas(width, height);
-
         this.areaSpawn = areaSpawn;
         this.interval = interval;
         if (x > this.YOfLastObstacle) {
@@ -44,25 +38,20 @@ public class Obstacle extends ObjectGame {
         canvas.setTranslateX(this.x);
         canvas.setTranslateY(this.y);
 
-        canvas.getGraphicsContext2D().drawImage(obstacleImg, 0, 0, this.width, this.height);
+        canvas.getGraphicsContext2D().drawImage(image, 0, 0, this.width, this.height);
         RotateTransition rotator = createRotator(canvas);
         rotator.play();
     }
 
-
-    @Override
-    public void clear() {
-        canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
-    }
-
-    @Override
-    public void draw() {
-        canvas.getGraphicsContext2D().drawImage(obstacleImg, 0,0,width,height);
+    public void upSpeed() {
+        if (speed < maxSpeed) {
+            speed++;
+        }
     }
 
     @Override
     public void updateObject() {
-        if ((this.x < -50 && width == 50) || (this.x < -150 && width == 150) ) {
+        if (this.x < -(width)) {
             Random rand = new Random(System.currentTimeMillis() / (long)YOfLastObstacle);
             this.x = rand.nextInt(this.areaSpawn) + this.YOfLastObstacle + this.interval;
             this.y = rand.nextInt(120) + 250; // 200 - 370;
@@ -76,7 +65,7 @@ public class Obstacle extends ObjectGame {
     }
 
     private RotateTransition createRotator(Node card) {
-        RotateTransition rotator = new RotateTransition(Duration.millis(1000), card);
+        RotateTransition rotator = new RotateTransition(Duration.millis(10), card);
         rotator.setByAngle(360);
         rotator.setInterpolator(Interpolator.LINEAR);
         rotator.setCycleCount(Timeline.INDEFINITE);

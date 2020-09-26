@@ -8,9 +8,10 @@ public class Ground extends ObjectGame {
     public double speed = 6;
 
     Ground(double x, double y, double width, double height, Image image) {
-        this.height = height;   // 50
-        this.width = width;     // 130
+        this.height = height;
+        this.width = width;
         this.image = image;
+        this.y = y;
 
         if (this.YOfLastGround <= x) {
             this.YOfLastGround = x;
@@ -23,9 +24,6 @@ public class Ground extends ObjectGame {
 
         this.x = this.YOfLastGround;
         this.YOfLastGround += width;
-        System.out.println(this.x);
-        System.out.println(this.YOfLastGround);
-
     }
 
     @Override
@@ -42,12 +40,7 @@ public class Ground extends ObjectGame {
     }
 
     @Override
-    public void clear() {
-        canvas.getGraphicsContext2D().clearRect(0, 0, this.width, this.height);
-    }
+    public void Restart() {
 
-    @Override
-    public void draw() {
-        canvas.getGraphicsContext2D().drawImage(this.image, 0, 0, this.width, this.height);
     }
 }

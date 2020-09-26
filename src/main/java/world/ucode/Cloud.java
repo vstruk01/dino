@@ -6,28 +6,42 @@ import javafx.scene.image.Image;
 import java.util.Random;
 
 public class Cloud extends ObjectGame {
-    static double YOfLastGround;
+    static double XOfLastGround;
     public double speed = 1;
 
-    Cloud(double x, double y, double width, double height, Image image) {
+    Cloud(double x, double width, double height, Image image) {
         this.height = height;   // 50
         this.width = width;     // 130
         this.image = image;
+        Random rand = new Random(System.currentTimeMillis());
+        canvas = new Canvas(this.width, this.height);
 
-        if (this.YOfLastGround <= x) {
-            this.YOfLastGround = x;
+        if (this.XOfLastGround <= x) {
+            this.XOfLastGround = x;
         }
 
-        canvas = new Canvas(this.width, this.height);
-        canvas.setTranslateX(this.YOfLastGround);
-        canvas.setTranslateY(400);
+        this.XOfLastGround += rand.nextInt(100) + 100;
+        canvas.setTranslateX(this.XOfLastGround);
+        canvas.setTranslateY(rand.nextInt(300) + 20);
+        this.x = this.XOfLastGround;
+        this.XOfLastGround += this.width;
+
         draw();
+    }
 
-        this.x = this.YOfLastGround;
-        this.YOfLastGround += width;
-        System.out.println(this.x);
-        System.out.println(this.YOfLastGround);
+    @Override
+    public void Restart() {
+        if (x < 1000) {
+            Random rand = new Random(System.currentTimeMillis());
 
+            this.XOfLastGround += rand.nextInt(100) + 100;
+            canvas.setTranslateX(this.XOfLastGround);
+            canvas.setTranslateY(rand.nextInt(300) + 20);
+            this.x = this.XOfLastGround;
+            this.XOfLastGround += this.width;
+
+            draw();
+        }
     }
 
     @Override
@@ -35,12 +49,14 @@ public class Cloud extends ObjectGame {
         if (this.x < -(this.width)) {
             Random rand = new Random(System.currentTimeMillis());
 
-            this.x = rand.nextInt(100) + YOfLastGround + 100;
-            this.x = YOfLastGround;
-            YOfLastGround += this.x + this.width;
+            this.XOfLastGround += rand.nextInt(100) + 100;
+            canvas.setTranslateX(this.XOfLastGround);
+            canvas.setTranslateY(rand.nextInt(300) + 20);
+            this.x = XOfLastGround;
+            XOfLastGround += this.width;
         }
-        if (YOfLastGround == this.x + this.width) {
-            YOfLastGround -= speed;
+        if (XOfLastGround == this.x + this.width) {
+            XOfLastGround -= speed;
         }
         this.x -= speed;
         canvas.setTranslateX(this.x);

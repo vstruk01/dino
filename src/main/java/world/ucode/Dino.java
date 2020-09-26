@@ -4,6 +4,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.image.*;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.paint.Color;
 
 
 public class Dino extends ObjectGame {
@@ -52,12 +53,30 @@ public class Dino extends ObjectGame {
         this.maxHeight = y;
         canvas = new Canvas(width, height);
 
+
+
         Sprites[0] = new Image("main-character3.png");
         Sprites[1] = new Image("main-character1.png");
         Sprites[2] = new Image("main-character2.png");
         Sprites[3] = new Image("main-character6.png");
         Sprites[4] = new Image("main-character5.png");
         Sprites[5] = new Image("main-character4.png");
+    }
+
+    @Override
+    public void Restart() {
+        clear();
+        this.y = this.maxHeight;
+        this.width = 80;
+        this.height = 86;
+        currSpriteIdx = posSprite.DEFAULT;
+        direction = Direction.DEFAULT;
+        this.image = this.Sprites[this.currSpriteIdx.getValue()];
+
+        canvas.setTranslateX(this.x);
+        canvas.setTranslateY(this.y);
+
+        draw();
     }
 
     @Override
@@ -108,7 +127,7 @@ public class Dino extends ObjectGame {
         if ((event.getCode() == KeyCode.SPACE || event.getCode() == KeyCode.UP ) && this.direction == Direction.DEFAULT) {
             this.direction = Direction.FLY_UP;
         } else if (event.getCode() == KeyCode.DOWN &&  (this.direction == Direction.FLY_UP || this.direction == Direction.FLY_DOWN)) {
-            this.speedFly *= 2;
+            this.speedFly *= 3;
             this.direction = Direction.FLY_DOWN;
         } else if (event.getCode() == KeyCode.DOWN && this.direction == Direction.DEFAULT) {
             clear();

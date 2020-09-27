@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.image.*;
@@ -21,6 +22,8 @@ import javafx.scene.text.FontWeight;
 public class GamePlay {
     final private double heightMainWindow = 500;
     final private double widthMainWindow = 1000;
+
+    public Polygon s1, s2;
 
     Button restartButton = new Button();
     Image imageButton = new Image("replay_button.png");
@@ -103,30 +106,26 @@ public class GamePlay {
             for (Cloud cloud : clouds) {
                 cloud.updateObject();
             }
+            collision();
 //            if (score % 100 == 0) {
 //                for (Obstacle obstacle : obstacles) {
 //                    obstacle.upSpeed();
+//                }
 //            }
-//            }
-            collision();
         }
 
         // collision
         private void collision() {
             for (Obstacle obstacle : obstacles) {
-                Rectangle s1 = obstacle.getHitBox();
-                s1.setY(obstacle.getY() - 5);
-                s1.setX(obstacle.getX() - 5);
+                        s1 = obstacle.getHitBox();
                 for (Dino dino : dins) {
-                    Rectangle s2 = dino.getHitBox();
-                    s2.setY(dino.getY() - 5);
-                    s2.setX(dino.getX() - 5);
+                            s2 = dino.getHitBox();
                     if (s1.intersects(s2.getBoundsInLocal())) {
-//                        s1.setFill(Color.BLACK);
-//                        s1.setStroke(Color.BLACK);
-//                        s2.setFill(Color.BLACK);
-//                        s2.setStroke(Color.BLACK);
-//                        g1.getChildren().addAll(s1,s2);
+                          s1.setFill(Color.RED);
+                        s1.setStroke(Color.RED);
+                          s2.setFill(Color.RED);
+                        s2.setStroke(Color.RED);
+                        g1.getChildren().addAll(s1,s2);
                         timer.stop();
                         Restart();
                     }
@@ -135,6 +134,7 @@ public class GamePlay {
         }
         public void Restart() {
             g1.getChildren().addAll(restartButton, gameOver);
+            g1.getChildren().removeAll(s1,s2);
         }
     }
 
@@ -195,6 +195,8 @@ public class GamePlay {
         restartButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                g1.getChildren().removeAll(s1,s2);
+
                 if (score > record) {
                     record = score;
                     recordText.setText("Record: " + record);

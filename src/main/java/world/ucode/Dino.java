@@ -5,6 +5,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.image.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
 
 
 public class Dino extends ObjectGame {
@@ -61,6 +63,26 @@ public class Dino extends ObjectGame {
         Sprites[3] = new Image("main-character6.png");
         Sprites[4] = new Image("main-character5.png");
         Sprites[5] = new Image("main-character4.png");
+    }
+
+
+    @Override
+    public Polygon getHitBox() {
+        Polygon pol = new Polygon();
+        Double[] d = new Double[] {
+                this.x, this.y,
+                this.x+ this.width, this.y,
+                this.x+ this.width, this.y + (this.height / 3),
+                this.x+ this.width - 15, this.y + 30,
+                this.x+ this.width - 15, this.y + this.height - (this.height / 4),
+                this.x+ this.width - 30, this.y + this.height - (this.height / 4),
+                this.x+ this.width - 30, this.y + this.height,
+                this.x+ 25, this.y + this.height,
+                this.x, this.y + this.height - (this.height / 3),
+        };
+
+        pol.getPoints().addAll(d);
+        return pol;
     }
 
     @Override

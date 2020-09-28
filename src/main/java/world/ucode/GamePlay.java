@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.image.*;
 import javafx.stage.Stage;
@@ -23,7 +22,7 @@ public class GamePlay {
     final private double heightMainWindow = 500;
     final private double widthMainWindow = 1000;
 
-    public Polygon s1, s2;
+    private Polygon pol1, pol2;
 
     Button restartButton = new Button();
     Image imageButton = new Image("replay_button.png");
@@ -45,7 +44,6 @@ public class GamePlay {
     Dino[] dins = new Dino[countDino];
 
     final private Text scoreText = new Text();
-    final private Text fpsText = new Text();
     final private Text recordText = new Text();
     private int score = 0;
     private int record = score;
@@ -76,21 +74,6 @@ public class GamePlay {
             update();
             score++;
             scoreText.setText("Score: " + score);
-
-            // for FPS
-//            long start = System.currentTimeMillis();
-
-//            long end = System.currentTimeMillis();
-//            if (end - start < 16) {
-//                try {
-//                    Thread.sleep(16 - (end - start));
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//            end = System.currentTimeMillis();
-//            fpsText.setText("fps: " +  (1000 / (end - start)));
-
         }
 
         private void update() {
@@ -107,34 +90,35 @@ public class GamePlay {
                 cloud.updateObject();
             }
             collision();
-//            if (score % 100 == 0) {
-//                for (Obstacle obstacle : obstacles) {
-//                    obstacle.upSpeed();
-//                }
-//            }
+            if (score % 200 == 0 && score != 0) {
+                for (Obstacle obstacle : obstacles) {
+                    obstacle.upSpeed();
+                }
+            }
         }
 
         // collision
         private void collision() {
             for (Obstacle obstacle : obstacles) {
-                        s1 = obstacle.getHitBox();
+                if (obstacle.getX() > 300) {
+                    continue;
+                }
+                Polygon[] s1 = obstacle.getHitBox();
                 for (Dino dino : dins) {
-                            s2 = dino.getHitBox();
-                    if (s1.intersects(s2.getBoundsInLocal())) {
-                          s1.setFill(Color.RED);
-                        s1.setStroke(Color.RED);
-                          s2.setFill(Color.RED);
-                        s2.setStroke(Color.RED);
-                        g1.getChildren().addAll(s1,s2);
-                        timer.stop();
-                        Restart();
+                    Polygon[]  s2 = dino.getHitBox();
+                    for (Polygon p1 : s1) {
+                        for (Polygon p2 : s2) {
+                            if (p1.intersects(p2.getBoundsInLocal())) {
+                                pol1 = p1;
+                                pol2 = p2;
+                                timer.stop();
+                                g1.getChildren().addAll(restartButton, gameOver, pol2, pol1);
+                                return;
+                            }
+                        }
                     }
                 }
             }
-        }
-        public void Restart() {
-            g1.getChildren().addAll(restartButton, gameOver);
-            g1.getChildren().removeAll(s1,s2);
         }
     }
 
@@ -159,19 +143,48 @@ public class GamePlay {
 
         scoreText.setText("Score: " + score);
         recordText.setText("Record: " + record);
-        fpsText.setText("fps: 0");
 
         scoreText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
         recordText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
-        fpsText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 
         scoreText.setY(20);
         scoreText.setX(20);
         recordText.setY(20);
         recordText.setX(widthMainWindow / 2);
-        fpsText.setY(20);
-        fpsText.setX(widthMainWindow - 80);
 
+        this.addAll();
+
+        gameOver.setTranslateX(400);
+        gameOver.setTranslateY(200);
+        restartButton.setTranslateX(480);
+        restartButton.setTranslateY(300);
+
+        restartButton.setGraphic(new ImageView(imageButton));
+        restartButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (score > record) {
+                    record = score;
+                    recordText.setText("Record: " + record);
+                }
+                score = 0;
+
+                for (Dino dino : dins) {
+                    dino.Restart();
+                }
+                for (Obstacle obstacle : obstacles) {
+                    obstacle.Restart();
+                }
+                for (Ground ground : grounds) {
+                    ground.Restart();
+                }
+                System.out.println(g1.getChildren().removeAll(restartButton, gameOver, pol1, pol2));
+                timer.start();
+            }
+        });
+    }
+
+    private void addAll() {
         for (Cloud cloud : clouds) {
             g1.getChildren().add(cloud.getCanvas());
         }
@@ -184,44 +197,9 @@ public class GamePlay {
         for (Obstacle obstacle : obstacles) {
             g1.getChildren().add(obstacle.getCanvas());
         }
-        g1.getChildren().addAll(scoreText, recordText, fpsText);
 
-        gameOver.setTranslateX(400);
-        gameOver.setTranslateY(200);
-        restartButton.setTranslateX(480);
-        restartButton.setTranslateY(300);
-
-        restartButton.setGraphic(new ImageView(imageButton));
-        restartButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                g1.getChildren().removeAll(s1,s2);
-
-                if (score > record) {
-                    record = score;
-                    recordText.setText("Record: " + record);
-                }
-                score = 0;
-
-                g1.getChildren().removeAll(restartButton, gameOver);
-                for (Dino dino : dins) {
-                    dino.Restart();
-                }
-                for (Obstacle obstacle : obstacles) {
-                    obstacle.Restart();
-                }
-                for (Ground ground : grounds) {
-                    ground.Restart();
-                }
-//                for (Cloud cloud : clouds) {
-//                    cloud.Restart();
-//                }
-                timer.start();
-            }
-        });
+        g1.getChildren().addAll(scoreText, recordText);
     }
-
-
 
     // set handle
     public  void setHandle(Scene scene) {

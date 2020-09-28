@@ -10,11 +10,11 @@ import javafx.scene.shape.Rectangle;
 
 
 public class Dino extends ObjectGame {
-    public long speed = 100;
-    final private Speed speedDino = new Speed();
+    private long speed = 100;
+    private final Speed speedDino = new Speed();
 
-    public double speedFly = 30;
-    final private int countSprites = 6;
+    private double speedFly = 30;
+    private final int countSprites = 6;
     private double maxHeight;
     final private double sizeJump = 256;
 
@@ -55,8 +55,6 @@ public class Dino extends ObjectGame {
         this.maxHeight = y;
         canvas = new Canvas(width, height);
 
-
-
         Sprites[0] = new Image("main-character3.png");
         Sprites[1] = new Image("main-character1.png");
         Sprites[2] = new Image("main-character2.png");
@@ -67,27 +65,49 @@ public class Dino extends ObjectGame {
 
 
     @Override
-    public Polygon getHitBox() {
-        Polygon pol = new Polygon();
-        Double[] d = new Double[] {
-                this.x, this.y,
-                this.x+ this.width, this.y,
-                this.x+ this.width, this.y + (this.height / 3),
-                this.x+ this.width - 15, this.y + 30,
-                this.x+ this.width - 15, this.y + this.height - (this.height / 4),
-                this.x+ this.width - 30, this.y + this.height - (this.height / 4),
-                this.x+ this.width - 30, this.y + this.height,
-                this.x+ 25, this.y + this.height,
+    public Polygon[] getHitBox() {
+        this.countPolygon = 3;
+        Polygon[] pol = new Polygon[countPolygon]; // for Head, Body, Legs
+
+        for (int i = 0; i < this.countPolygon; i++) {
+            pol[i] = new Polygon();
+        }
+
+        Double[] boxHead = new Double[] {
+                this.x + (this.width / 2), this.y,
+                this.x + this.width, this.y,
+                this.x + this.width, this.y + (this.height / 3),
+                this.x + (this.width / 2), this.y + (this.height / 3),
+        };
+
+        Double[] boxBody = new Double[] {
+                this.x, this.y + (this.height / 3),
+                this.x + this.width - 15, this.y + (this.height / 3),
+                this.x + this.width - 15, this.y + this.height - (this.height / 3),
                 this.x, this.y + this.height - (this.height / 3),
         };
 
-        pol.getPoints().addAll(d);
+        Double[] boxLegs = new Double[] {
+                this.x + (this.width / 5), this.y + this.height - (this.height / 3),
+                this.x + (this.width - ((this.width / 5) * 2)), this.y + this.height - (this.height / 3),
+                this.x + (this.width - ((this.width / 5) * 2)), this.y + this.height,
+                this.x + (this.width / 5), this.y + this.height,
+        };
+
+        pol[0].getPoints().addAll(boxHead);
+        pol[1].getPoints().addAll(boxBody);
+        pol[2].getPoints().addAll(boxLegs);
         return pol;
     }
 
     @Override
     public void Restart() {
         clear();
+        if (this.direction == Direction.DOWN) {
+            maxHeight -= 30; // height of sprite of down is smaller than height of sprite default on 30px,
+                             // when direction is down maxHeight has change on 30px up,
+                             // if player was dead in direction down maxHeight have to subtract 30px;
+        }
         this.y = this.maxHeight;
         this.width = 80;
         this.height = 86;
@@ -153,7 +173,7 @@ public class Dino extends ObjectGame {
             this.direction = Direction.FLY_DOWN;
         } else if (event.getCode() == KeyCode.DOWN && this.direction == Direction.DEFAULT) {
             clear();
-            this.y += 30;
+            this.y += 30; // height of sprite of down is smaller than height of sprite default on 30px
             this.maxHeight = this.y;
             this.width = 110;
             this.height = 56;

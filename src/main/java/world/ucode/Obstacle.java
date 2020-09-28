@@ -10,10 +10,13 @@ import javafx.scene.*;
 
 public class Obstacle extends ObjectGame {
     static double YOfLastObstacle;
-    private double speed = 12;
+    private double speedDefault = 12;
+    private double speed = speedDefault;
     final private double maxSpeed = 20;
 
+    private double intervalDefault;
     private double interval;
+    private int areaSpawnDefault;
     private int areaSpawn;
 
     Obstacle(double x, double interval, int areaSpawn, double width, double height) {
@@ -24,6 +27,8 @@ public class Obstacle extends ObjectGame {
         canvas = new Canvas(width, height);
         this.areaSpawn = areaSpawn;
         this.interval = interval;
+        this.intervalDefault = interval;
+        this.areaSpawnDefault = areaSpawn;
         if (x > this.YOfLastObstacle) {
             YOfLastObstacle = x;
         }
@@ -45,24 +50,27 @@ public class Obstacle extends ObjectGame {
     }
 
     public void Restart() {
+        this.speed = this.speedDefault;
+        this.interval = this.intervalDefault;
+        this.areaSpawn = this.areaSpawnDefault;
         if (x < 1000) {
             Random rand = new Random(System.currentTimeMillis());
             this.y = rand.nextInt(120) + 250;                                                   // 200 - 370
             this.x = rand.nextInt(this.areaSpawn) + this.interval + this.YOfLastObstacle;      // (x + interval) - areaSpawn
             YOfLastObstacle = this.x;
 
-            canvas.setTranslateX(this.x);
-            canvas.setTranslateY(this.y);
+            this.canvas.setTranslateX(this.x);
+            this.canvas.setTranslateY(this.y);
 
             draw();
         }
     }
 
     public void upSpeed() {
-        if (speed < maxSpeed) {
-            this.interval += 20;
-            areaSpawn += 20;
-            speed++;
+        if (this.speed < this.maxSpeed) {
+            this.interval += 30;
+            this.areaSpawn += 30;
+            this.speed += 1;
         }
     }
 
@@ -83,7 +91,7 @@ public class Obstacle extends ObjectGame {
     }
 
     private RotateTransition createRotator(Node card) {
-        RotateTransition rotator = new RotateTransition(Duration.millis(50), card);
+        RotateTransition rotator = new RotateTransition(Duration.millis(500), card);
         rotator.setByAngle(360);
         rotator.setInterpolator(Interpolator.LINEAR);
         rotator.setCycleCount(Timeline.INDEFINITE);

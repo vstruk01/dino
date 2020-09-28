@@ -2,14 +2,21 @@ package world.ucode;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 
 abstract class ObjectGame {
     public abstract void updateObject();
     public abstract void Restart();
+    public int countPolygon = 1;
 
-    public Polygon getHitBox() {
-        Polygon pol = new Polygon();
+    public Polygon[] getHitBox() {
+        Polygon[] pol = new Polygon[countPolygon];
+
+        for (int i = 0; i < countPolygon; i++) {
+            pol[i] = new Polygon();
+        }
+
         Double[] d = new Double[] {
                 this.x+ 5.0, y + 5.0,
                 this.x+ this.width - 5, y + 5.0,
@@ -17,7 +24,7 @@ abstract class ObjectGame {
                 this.x+ 5.0, y + this.height - 5,
         };
 
-        pol.getPoints().addAll(d);
+        pol[0].getPoints().addAll(d);
         return pol;
     }
 

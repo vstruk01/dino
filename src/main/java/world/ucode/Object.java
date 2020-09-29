@@ -12,7 +12,6 @@ abstract class ObjectGame {
 
     public Polygon[] getHitBox() {
         Polygon[] pol = new Polygon[countPolygon];
-
         for (int i = 0; i < countPolygon; i++) {
             pol[i] = new Polygon();
         }

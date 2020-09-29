@@ -8,22 +8,31 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 
+import java.security.Key;
+import java.util.HashMap;
+
 
 public class Dino extends ObjectGame {
-    private long speed = 100;
+    HashMap<KeyCode, Boolean> keymap = new HashMap<KeyCode, Boolean>();
+
+    private long defSpeed = 100;
+    private long maxSpeed = 50;
+    private long speed = defSpeed;
     private final Speed speedDino = new Speed();
 
     private double speedFly = 30;
     private final int countSprites = 6;
     private double maxHeight;
     final private double sizeJump = 256;
+    private double xDefault;
 
 
     public enum Direction {
         DEFAULT,
         FLY_UP,
         FLY_DOWN,
-        DOWN
+        DOWN,
+        OVER
     }
     public Direction direction = Direction.DEFAULT;
 
@@ -52,6 +61,7 @@ public class Dino extends ObjectGame {
         height = 86;
         this.x = x;
         this.y = y;
+        this.xDefault = this.x;
         this.maxHeight = y;
         canvas = new Canvas(width, height);
 
@@ -61,6 +71,10 @@ public class Dino extends ObjectGame {
         Sprites[3] = new Image("main-character6.png");
         Sprites[4] = new Image("main-character5.png");
         Sprites[5] = new Image("main-character4.png");
+
+        keymap.put(KeyCode.SPACE, false);
+        keymap.put(KeyCode.DOWN, false);
+        keymap.put(KeyCode.UP, false);
     }
 
 
@@ -100,29 +114,56 @@ public class Dino extends ObjectGame {
         return pol;
     }
 
+    public void upSpeed() {
+        if (speed > maxSpeed) {
+            speed -= 3;
+        }
+    }
+
     @Override
     public void Restart() {
         clear();
-        if (this.direction == Direction.DOWN) {
-            maxHeight -= 30; // height of sprite of down is smaller than height of sprite default on 30px,
-                             // when direction is down maxHeight has change on 30px up,
-                             // if player was dead in direction down maxHeight have to subtract 30px;
-        }
-        this.y = this.maxHeight;
-        this.width = 80;
-        this.height = 86;
-        currSpriteIdx = posSprite.DEFAULT;
-        direction = Direction.DEFAULT;
-        this.image = this.Sprites[this.currSpriteIdx.getValue()];
 
-        canvas.setTranslateX(this.x);
-        canvas.setTranslateY(this.y);
+        this.speed = this.defSpeed;
+        this.canvas.setTranslateX(this.x);
+        this.canvas.setTranslateY(this.y);
 
         draw();
     }
 
+    public void over() {
+        clear();
+        if (this.direction == Direction.DOWN) {
+            this.maxHeight -= 30; // height of sprite of down is smaller than height of sprite default on 30px,
+                                  // when direction is down maxHeight has change on 30px up,
+                                  // if player was dead in direction down maxHeight have to subtract 30px;
+            this.y = maxHeight;
+            this.x += 30;
+        }
+        this.canvas.setTranslateX(this.x);
+        this.canvas.setTranslateY(this.y);
+        this.width = 80;
+        this.height = 86;
+        this.currSpriteIdx = posSprite.OVER;
+        this.direction = Direction.OVER;
+        this.image = this.Sprites[this.currSpriteIdx.getValue()];
+
+        draw();
+
+        if (this.x != this.xDefault) {
+            this.x = this.xDefault;
+        }
+        this.y = this.maxHeight;
+        currSpriteIdx = posSprite.DEFAULT;
+        direction = Direction.DEFAULT;
+        this.image = this.Sprites[this.currSpriteIdx.getValue()];
+    }
+
     @Override
     public void updateObject() {
+        if (this.direction == Direction.OVER) {
+            return;
+        }
         clear();
         if (direction == Direction.FLY_UP) {
             this.y -= (y - 40) / maxHeight * speedFly;
@@ -130,15 +171,22 @@ public class Dino extends ObjectGame {
         } else if (direction == Direction.FLY_DOWN) {
             this.y += (y - 40) / maxHeight * speedFly;
             currSpriteIdx = posSprite.DEFAULT;
+            if (this.y >= maxHeight && keymap.get(KeyCode.DOWN)) {
+                this.y = maxHeight;
+                this.toDown();
+            } else if (this.y >= maxHeight) {
+                this.y = maxHeight;
+            }
         }
 
         if (y <= maxHeight - sizeJump) {
             this.y = maxHeight - sizeJump;
             this.direction = Direction.FLY_DOWN;
-        } else if (y > maxHeight) {
-            this.currSpriteIdx = posSprite.UP_LEFT;
-            this.y = maxHeight;
         }
+//        } else if (y > maxHeight) {
+//            this.currSpriteIdx = posSprite.UP_LEFT;
+//            this.y = maxHeight;
+//        }
         if (this.y == maxHeight) {
             speedFly = 30;
             if (direction == Direction.FLY_DOWN) {
@@ -164,26 +212,38 @@ public class Dino extends ObjectGame {
         draw();
     }
 
+    private void toDown() {
+        clear();
+        this.y += 30; // height of sprite of down is smaller than height of sprite default on 30px
+        this.maxHeight = this.y;
+        this.width = 110;
+        this.height = 56;
+        this.currSpriteIdx = posSprite.DOWN_RIGHT;
+        this.direction = Direction.DOWN;
+    }
+
     public void setDirectionPressed(KeyEvent event) {
         if (event == null) { return; }
-        if ((event.getCode() == KeyCode.SPACE || event.getCode() == KeyCode.UP ) && this.direction == Direction.DEFAULT) {
+        if (event.getCode() == KeyCode.SPACE && this.direction == Direction.DEFAULT) {
+            keymap.replace(KeyCode.SPACE, true);
+            this.direction = Direction.FLY_UP;
+        }
+        if (event.getCode() == KeyCode.UP && this.direction == Direction.DEFAULT) {
+            keymap.replace(KeyCode.UP, true);
             this.direction = Direction.FLY_UP;
         } else if (event.getCode() == KeyCode.DOWN &&  (this.direction == Direction.FLY_UP || this.direction == Direction.FLY_DOWN)) {
+            keymap.replace(KeyCode.DOWN, true);
             this.speedFly *= 3;
             this.direction = Direction.FLY_DOWN;
         } else if (event.getCode() == KeyCode.DOWN && this.direction == Direction.DEFAULT) {
-            clear();
-            this.y += 30; // height of sprite of down is smaller than height of sprite default on 30px
-            this.maxHeight = this.y;
-            this.width = 110;
-            this.height = 56;
-            this.currSpriteIdx = posSprite.DOWN_RIGHT;
-            this.direction = Direction.DOWN;
+            keymap.replace(KeyCode.DOWN, true);
+            toDown();
         }
     }
     public void setDirectionReleased(KeyEvent event) {
         if (event == null) { return; }
         if (event.getCode() == KeyCode.DOWN && this.direction == Dino.Direction.DOWN) {
+            keymap.replace(KeyCode.DOWN, false);
             clear();
             this.y -= 30;
             this.maxHeight = this.y;
@@ -191,6 +251,12 @@ public class Dino extends ObjectGame {
             this.height = 86;
             this.currSpriteIdx = posSprite.UP_RIGHT;
             this.direction = Dino.Direction.DEFAULT;
+        } else if (event.getCode() == KeyCode.SPACE) {
+            keymap.replace(KeyCode.SPACE, false);
+        } else if (event.getCode() == KeyCode.UP) {
+            keymap.replace(KeyCode.UP, false);
+        } else if (event.getCode() == KeyCode.DOWN) {
+            keymap.replace(KeyCode.DOWN, false);
         }
     }
 }

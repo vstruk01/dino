@@ -5,7 +5,9 @@ import javafx.scene.image.Image;
 
 public class Ground extends ObjectGame {
     static double YOfLastGround;
-    public double speed = 6;
+    public double defSpeed = 6;
+    public double maxSpeed = 12;
+    public double speed = defSpeed;
 
     Ground(double x, double y, double width, double height, Image image) {
         this.height = height;
@@ -26,6 +28,12 @@ public class Ground extends ObjectGame {
         this.YOfLastGround += width;
     }
 
+    public void upSpeed() {
+        if (speed < maxSpeed) {
+            speed += 0.5;
+        }
+    }
+
     @Override
     public void updateObject() {
         if (this.x < -(this.width)) {
@@ -41,6 +49,6 @@ public class Ground extends ObjectGame {
 
     @Override
     public void Restart() {
-
+        this.speed = this.defSpeed;
     }
 }

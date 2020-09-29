@@ -94,6 +94,12 @@ public class GamePlay {
                 for (Obstacle obstacle : obstacles) {
                     obstacle.upSpeed();
                 }
+                for (Dino dino : dins) {
+                    dino.upSpeed();
+                }
+                for (Ground ground : grounds) {
+                    ground.upSpeed();
+                }
             }
         }
 
@@ -111,8 +117,10 @@ public class GamePlay {
                             if (p1.intersects(p2.getBoundsInLocal())) {
                                 pol1 = p1;
                                 pol2 = p2;
+                                dino.over();
                                 timer.stop();
-                                g1.getChildren().addAll(restartButton, gameOver, pol2, pol1);
+                                g1.getChildren().addAll(restartButton, gameOver);
+//                                g1.getChildren().addAll(pol1, pol2); for show hit box
                                 return;
                             }
                         }
@@ -143,6 +151,10 @@ public class GamePlay {
 
         scoreText.setText("Score: " + score);
         recordText.setText("Record: " + record);
+        scoreText.setFill(Color.BLUE);
+        recordText.setFill(Color.RED);
+         scoreText.setStroke(Color.BLACK);
+        recordText.setStroke(Color.BLUE);
 
         scoreText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
         recordText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
@@ -150,7 +162,7 @@ public class GamePlay {
         scoreText.setY(20);
         scoreText.setX(20);
         recordText.setY(20);
-        recordText.setX(widthMainWindow / 2);
+        recordText.setX(widthMainWindow / 2 - 50);
 
         this.addAll();
 
@@ -178,7 +190,8 @@ public class GamePlay {
                 for (Ground ground : grounds) {
                     ground.Restart();
                 }
-                System.out.println(g1.getChildren().removeAll(restartButton, gameOver, pol1, pol2));
+                g1.getChildren().removeAll(restartButton, gameOver);
+//                g1.getChildren().removeAll(pol1, pol2); for delete hit box
                 timer.start();
             }
         });

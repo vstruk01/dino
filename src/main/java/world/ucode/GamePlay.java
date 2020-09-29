@@ -64,6 +64,7 @@ public class GamePlay {
         primaryStage.setTitle("T-Rex Runner");
         primaryStage.setScene(scene);
         primaryStage.centerOnScreen();
+        primaryStage.setResizable(false);
 
         primaryStage.show();
         timer.start();

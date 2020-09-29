@@ -11,8 +11,8 @@ import javafx.scene.*;
 public class Obstacle extends ObjectGame {
     static double YOfLastObstacle;
     private double speedDefault = 12;
-    private double speed = speedDefault;
     final private double maxSpeed = 25;
+    private double speed = speedDefault;
 
     private double intervalDefault;
     private double interval;

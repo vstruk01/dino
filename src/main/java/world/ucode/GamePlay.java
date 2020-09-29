@@ -195,7 +195,7 @@ public class GamePlay {
                     ground.Restart();
                 }
                 g1.getChildren().removeAll(restartButton, gameOver);
-//                g1.getChildren().removeAll(pol1, pol2); for delete hit box
+//                g1.getChildren().removeAll(pol1, pol2); for delete hit box from window
                 timer.start();
             }
         });

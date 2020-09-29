@@ -55,6 +55,7 @@ public class Obstacle extends ObjectGame {
         this.speed = this.speedDefault;
         this.interval = this.intervalDefault;
         this.areaSpawn = this.areaSpawnDefault;
+        this.rotator.play();
         if (x < 1000) {
             Random rand = new Random(System.currentTimeMillis());
             this.y = rand.nextInt(80) + 290;                                                 // 200 - 370

@@ -118,6 +118,9 @@ public class GamePlay {
                                 pol1 = p1;
                                 pol2 = p2;
                                 dino.over();
+                                for (Obstacle obstacle1 : obstacles) {
+                                    obstacle1.rotator.stop();
+                                }
                                 timer.stop();
                                 g1.getChildren().addAll(restartButton, gameOver);
 //                                g1.getChildren().addAll(pol1, pol2); for show hit box

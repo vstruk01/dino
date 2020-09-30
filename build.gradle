@@ -14,9 +14,7 @@ dependencies {
     testImplementation 'junit:junit:4.13'
 }
 
-application {
-    mainClassName = "$moduleName/world.ucode.Main"
-}
+mainClassName = "$moduleName/world.ucode.Main"
 
 javafx {
     version = "11.0.2"

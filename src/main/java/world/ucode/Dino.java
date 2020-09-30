@@ -166,10 +166,10 @@ public class Dino extends ObjectGame {
         }
         clear();
         if (direction == Direction.FLY_UP) {
-            this.y -= (y - 45) / maxHeight * speedFly;
+            this.y -=  (y - 50) / maxHeight * speedFly;
             currSpriteIdx = posSprite.DEFAULT;
         } else if (direction == Direction.FLY_DOWN) {
-            this.y += (y - 45) / maxHeight * speedFly;
+            this.y +=  (y - 50) / maxHeight * speedFly;
             currSpriteIdx = posSprite.DEFAULT;
             if (this.y >= maxHeight && keymap.get(KeyCode.DOWN)) {
                 this.y = maxHeight;

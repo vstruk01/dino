@@ -141,7 +141,7 @@ public class GamePlay {
         imageGround[2] = new Image("land3.png");
 
         for (int i = 0; i < countCloud; i++) {
-            clouds[i] = new Cloud(0, 200, 100, new Image("cloud.PNG"));
+            clouds[i] = new Cloud(0, 100, 60, new Image("cloud.PNG"));
         }
         for (int i = 0; i < countDino; i++) {
             dins[i] = new Dino(100 + (i * 200), 350);

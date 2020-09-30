@@ -11,7 +11,7 @@ import javafx.scene.*;
 public class Obstacle extends ObjectGame {
     static double YOfLastObstacle;
     private double speedDefault = 12;
-    final private double maxSpeed = 25;
+    final private double maxSpeed = 20;
     private double speed = speedDefault;
 
     private double intervalDefault;
@@ -36,7 +36,7 @@ public class Obstacle extends ObjectGame {
         }
 
         Random rand = new Random(System.currentTimeMillis());
-        this.y = rand.nextInt(80) + 290;                                                   // 200 - 370
+        this.y = rand.nextInt(50) + 320;                                                   // 200 - 370
         this.x = rand.nextInt(this.areaSpawn) + this.interval + this.YOfLastObstacle;      // (x + interval) - areaSpawn
 
         if (this.x > this.YOfLastObstacle) {
@@ -58,7 +58,7 @@ public class Obstacle extends ObjectGame {
         this.rotator.play();
         if (x < 1000) {
             Random rand = new Random(System.currentTimeMillis());
-            this.y = rand.nextInt(80) + 290;                                                 // 200 - 370
+            this.y = rand.nextInt(50) + 320;
             this.x = rand.nextInt(this.areaSpawn) + this.interval + this.YOfLastObstacle;      // (x + interval) - areaSpawn
             YOfLastObstacle = this.x;
 
@@ -82,7 +82,7 @@ public class Obstacle extends ObjectGame {
         if (this.x < -(this.width)) {
             Random rand = new Random(System.currentTimeMillis() / (long)YOfLastObstacle);
             this.x = rand.nextInt(this.areaSpawn) + this.YOfLastObstacle + this.interval;
-            this.y = rand.nextInt(120) + 250; // 200 - 370;
+            this.y = rand.nextInt(50) + 320; // 200 - 370;
             YOfLastObstacle = this.x;
             canvas.setTranslateY(this.y);
         }
